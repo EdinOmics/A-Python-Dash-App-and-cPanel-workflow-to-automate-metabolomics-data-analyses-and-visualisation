@@ -1,3 +1,8 @@
+
+<p float="center">
+  <img alt="GitHubImage" src="https://github.com/user-attachments/assets/5f702018-d773-4fee-ba77-d7810235519a" width="1000" /> 
+</p>
+
 # A Python Dash App and cPanel workflow to automate metabolomics data analyses and visualisation
 For many customers who provide samples for untargeted metabolomics analyses, we may send your data back to you as an interactive report. This repository publicly provides the underlying algorithms behind the statistical analyses performed on data and how they are visualised. 
 
