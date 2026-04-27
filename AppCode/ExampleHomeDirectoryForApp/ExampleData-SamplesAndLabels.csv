@@ -1,0 +1,38 @@
+Sample,Label
+A Ext 1,A Ext
+A Ext 2,A Ext
+A Ext 3,A Ext
+A Int 1,A Int
+A Int 2,A Int
+A Int 3,A Int
+Blank01,Blank
+Blank02,Blank
+Blank03,Blank
+B Ext 1,B Ext
+B Ext 2,B Ext
+B Ext 3,B Ext
+B Int 1,B Int
+B Int 2,B Int
+B Int 3,B Int
+Control Ext 1,Control Ext
+Control Ext 2,Control Ext
+Control Ext 3,Control Ext
+Control Int 1,Control In
+Control Int 2,Control In
+Control Int 3,Control In
+C Ext 1,C Ext
+C Ext 2,C Ext
+C Ext 3,C Ext
+C Int 1,C Int
+C Int 2,C Int
+C Int 3,C Int
+QC01,QC
+QC02,QC
+QC03,QC
+QC04,QC
+QC05,QC
+QCdilution 0_0625,QC
+QCdilution 0_125,QC
+QCdilution 0_25,QC
+QCdilution 0_5,QC
+QCdilution 1_0,QC
