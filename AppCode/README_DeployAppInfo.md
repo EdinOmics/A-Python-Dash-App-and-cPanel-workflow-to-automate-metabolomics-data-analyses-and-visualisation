@@ -29,8 +29,8 @@ ExampleHomeDirectoryForApp:
 # Steps to set up and initially deploy this Python Dash App via cPanel
 ### Note: As some files are overwritten during this process, ensure that you have copies of app.py and passenger_wsgi.py in separate directories before you start these steps. 
 
-1) Set up the home directory for your Dash App within `public_html`
-2) Nagivate to the "Setup Python App" option within the "Software" tab
+1) Set up the home directory for your Dash App within `public_html` of cPanel
+2) Nagivate to the "Setup Python App" option within cPanel's "Software" tab
 3) Select "CREATE APPLICATION"
 4) Set up the app environment with the following settings:
    * Python version = 3.9.19
@@ -63,6 +63,63 @@ ExampleHomeDirectoryForApp:
 19)  Select "OPEN"
      * You should now be able to view your app's home page
      * Interact with the app to make sure that it works properly
+20) For any problems, see the passenger.log (error log) in the logs folder in the cPanel File Manager to help narrow down the problem
+21) See the Troubleshooting Guidance at the bottom of this page to possible fixes to common problems
        
 # Steps to update the Dash App to upload additional users/reports
+
+1) Ensure that your metabolomics data files are in the correct format
+2) It is recommended that you duplicate existing equivalent of the ExampleUser_MethodPage.py, ExampleUser_ResultsPage.py and, **if adding a new user account**, ExampleUser_UserHomePage.py files in the `pages` subdirectory and edit these as outlined below:
+   
+   a) `ExampleUser_MethodPage.py`
+     * The link for `accountIndexPage` should match the url in the path of `ExampleUser_UserHomePage.py` (and start with "/")
+     * `page_name` is the name of the page to be displayed to the user. This should be added within the list contained in `if page["name"].startswith((...))` in the report's respective `ExampleUser_UserHomePage.py`
+     * `path` should have its own unique url (starting with "/")
+     * The `order` should be changed to reflect which position you would like this report to be viewed in the user's home page (where the first page is "0")
+     * Update any general methods information in the rest of the script to align to those used for this user
+       
+   b) `ExampleUser_ResultsPage.py`
+     * The link for `accountIndexPage` should match the url in the path of `ExampleUser_UserHomePage.py`
+     * `page_name` is the name of the page to be displayed to the user. This should be added within the list contained in `if page["name"].startswith((...))` in the report's respective `ExampleUser_UserHomePage.py`
+     * `mainDataset` is set to the file name (containing .csv extension) of the main metabolomics results file 
+     * `samplesLabels` is set to the file name (containing .csv extension) containing the Sample names and group labels for these metabolomics results
+     * `path` should have its own unique url (starting with "/")
+     * The `order` should be changed to reflect which position you would like this report to be viewed in the user's home page (where the first page is "0")
+     * `project_no` should be changed to the desired project number for this project. This is added as a prefix to the names of files that the users download
+     * Use a replace tool in whichever text editor you are using so that the IDs of each element in the report have a suffix unique to this report
+       * Otherwise, the presence of duplicate IDs in callbacks (i.e. those present in other pages) will cause the Dash App to crash
+       
+   c) `ExampleUser_UserHomePage.py` (and also updating the existing `app.py`)
+     * Update the existing `app.py`
+       * In the `login_button_click()` function at the bottom of the script, copy an `elif` statement and change the `current_user.get_id()` and `href`
+     * `ExampleUser_UserHomePage.py`
+       * `name` should have the User's name
+       * `path` should match `accountIndexPage` in the `ExampleUser_MethodPage.py` and `ExampleUser_ResultsPage.py` scripts **and** the `href` for that user account in the `login_button_click()` function of `app.py`
+       * The first `html.H2` within the layout's `html.Div([])` should also have the name of the User specified
+       * The list contained in `if page["name"].startswith((...))` should have all the `name` for each page to be included in this user's home page to potentially select (including previously uploaded pages if you still want these to be available)
+      
+3) It is recommended that locally deploy these files first to test them at this point to ensure that A) they work as expected and B) do not contain errors with may crash the web hosted version of the app
+4) Log into cPanel
+5) Within the app's root directory, add:
+   * The CSV data files and (only if a new user profile is being added) the updated version of `app.py` into the app's home directory
+   * `ExampleUser_MethodPage.py`, `ExampleUser_ResultsPage.py`, and `ExampleUser_UserHomePage.py` into the `pages` subdirectory
+6) Navigate to cPanel's "Setup Python App" option in the "Software" tab
+7) Reset the currently running instance of the app to incorporate the files and changes you have just added
+8) Check the app to ensure that the newly added reports and accounts are accessible and work as expected
+9) For any problems, see the passenger.log (error log) in the logs folder in the cPanel File Manager to help narrow down the problem
+10) See the Troubleshooting Guidance at the bottom of this page to possible fixes to common problems
+
+# Troubleshooting Guidance
+#### Cannot deploy first instance of Python Dash app
+Occassionally, files running in the background from previous instances of the app can cause conflicts (even if they are seemingly removed). I have personally found that contacting your hosting provider and requesting to reset your cPanel account to the last backed-up point where it was working can fix this. **Ensure that you save your data onto your PC before the reset**.
+
+#### Pages are not being displayed (and there is no error message)
+This is usually due to paths not being correctly declared or linked together
+* Check `href` links
+* Temporarily paste the following code to print out the page details in passenger.log to check if the pages have the expected details registered
+
+If a page is set up completely correctly and is *still* not being displayed, this may be due to a strange glitch where - sometimes - if file names for the equivalent of `ExampleUser_MethodPage.py` and `ExampleUser_ResultsPage.py` are higher or lower relative to the account's equivalent of `ExampleUser_UserHomePage.py` (when sorted by file name alphabetical order), then it will not be read. Changing the first few letters of `ExampleUser_MethodPage.py` and/or `ExampleUser_ResultsPage.py` to change the alphabetical position of these files relative to `ExampleUser_UserHomePage.py` (for the account it is not displaying it) can fix this. 
+
+Note: the correctly functioning relative position of `ExampleUser_MethodPage.py` and `ExampleUser_ResultsPage.py` to `ExampleUser_UserHomePage.py` may be different depending on if you deploy the Dash app locally on your computer or on cPanel. 
+       
     
