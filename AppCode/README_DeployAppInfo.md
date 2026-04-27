@@ -1,20 +1,23 @@
-```bash
-├── app
-│   ├── css
-│   │   ├── **/*.css
+```HomeDirectory
+├── AccessDetails.txt
+├── app.py
+├── ExampleData-MetabolomicsResults.csv
+├── ExampleData-SamplesAndLabels.csv
+├── passenger_wsgi.py
+├── ReportDescriptiveText.py
+├── requirements.txt
+├── assets
+│   ├── EdinOmics_Logo_Transparent.png
 │   ├── favicon.ico
-│   ├── images
-│   ├── index.html
-│   ├── js
-│   │   ├── **/*.js
-│   └── partials/template
-├── dist (or build)
-├── node_modules
-├── bower_components (if using bower)
-├── test
-├── Gruntfile.js/gulpfile.js
-├── README.md
-├── package.json
-├── bower.json (if using bower)
-└── .gitignore
+│   ├── style.css
+│   ├── typography.css
+│   └── university-of-edinburgh-logo.png
+├── pages
+│   ├── ExampleUser_MethodPage.py
+│   ├── ExampleUser_ResultsPage.py
+│   ├── ExampleUser_UserHomePage.py
+│   ├── login.py
+│   └── logout.py
+└── README_DeployAppInfo.md
+
 ```
