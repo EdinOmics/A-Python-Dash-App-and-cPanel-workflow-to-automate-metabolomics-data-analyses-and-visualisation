@@ -1,4 +1,5 @@
-```HomeDirectory
+```
+ExampleHomeDirectoryForApp
 ├── AccessDetails.txt
 ├── app.py
 ├── ExampleData-MetabolomicsResults.csv
