@@ -29,5 +29,8 @@ Once your selected data has been normalised and statistical calculations perform
 #### Graphs 
 If using a computer/laptop, hovering over any graph with your cursor will display a number of options to allow you to zoom in/select regions of interest to view as well as download your graphs as PNG files. If using a touch screen device, these same options should display if you press the centre of your graph once. 
 
+# Deploy your own reports/access code used in these reports
+Further details about the background code used by these reports as well as guidance about deploying these apps, please see the `AppCode` directory of this repository. 
+
 #### Spreadsheets
 All data can also be downloaded as Excel worksheets. These are ideal if you want to save your data offline, manually inspect your data, or make graphs to your own aesthetic or publication requirements. To get these, select the Download Data options either in the tab for each respective statistical analysis type or accesss them all in the "Download Data" tab. 
