@@ -69,7 +69,34 @@ ExampleHomeDirectoryForApp:
 # Steps to update the Dash App to upload additional users/reports
 
 1) Ensure that your metabolomics data files are in the correct format
-2) It is recommended that you duplicate existing equivalent of the ExampleUser_MethodPage.py, ExampleUser_ResultsPage.py and, **if adding a new user account**, ExampleUser_UserHomePage.py files in the `pages` subdirectory and edit these as outlined below:
+   * Main metabolomics results (`mainDataset`)
+     * This Dash App is designed to read metabolomics data in CSV file format with the "Samples in columns (unpaired)" structure that MetaboAnalyst uses, with structure and **exact row names** as shown below:
+     
+| Sample                                          | A Ext 1  | A Ext 2  | A Ext 3  | A Int 1  | A Int 2  | A Int 3  |
+|-------------------------------------------------|----------|----------|----------|----------|----------|----------|
+| Label                                           | A Ext    | A Ext    | A Ext    | A Int    | A Int    | A Int    |
+| (S)-Adenosyl-L-methionine                       | 0.001    | 0.001    | 166899   | 0.001    | 178408.2 | 0.001    |
+| (S)-Carboxymethyl-L-cysteine                    | 303374.1 | 215336.9 | 266310.2 | 0.001    | 0.001    | 0.001    |
+| (S)-Hexyl-glutathione                           | 200957.2 | 178056   | 165733.8 | 0.001    | 55653.89 | 65993.74 |
+| (S)-Taurocholic Acid                            | 1.34E+07 | 1.19E+07 | 1.20E+07 | 1.24E+07 | 1.19E+07 | 1.26E+07 |
+| (S)-Taurodeoxycholic Acid                       | 0.001    | 0.001    | 0.001    | 0.001    | 0.001    | 0.001    |
+| 1,2-Didecanoyl-sn-glycero-3-phosphoethanolamine | 0.001    | 0.001    | 0.001    | 0.001    | 0.001    | 0.001    |
+
+
+   * File containing sample names and group labels (`samplesLabels`)
+     * To reduce the memory and performance impact that very large metabolomics datasets can have on the Dash app's performance, the sample names and group labels are put into this separate CSV file as well to allow the user to initially select their desired samples for analysis before the entire metabolomics dataset is loaded (and potentially quickly subset to only the user's desired samples to analyse)
+     
+| Sample  | Label |
+|---------|-------|
+| A Ext 1 | A Ext |
+| A Ext 2 | A Ext |
+| A Ext 3 | A Ext |
+| A Int 1 | A Int |
+| A Int 2 | A Int |
+| A Int 3 | A Int |
+
+     
+1) It is recommended that you duplicate existing equivalent of the `ExampleUser_MethodPage.py`, `ExampleUser_ResultsPage.py` and, **if adding a new user account**, `ExampleUser_UserHomePage.py` files in the `pages` subdirectory and edit these as outlined below:
    
    a) `ExampleUser_MethodPage.py`
      * The link for `accountIndexPage` should match the url in the path of `ExampleUser_UserHomePage.py` (and start with "/")
@@ -98,25 +125,37 @@ ExampleHomeDirectoryForApp:
        * The first `html.H2` within the layout's `html.Div([])` should also have the name of the User specified
        * The list contained in `if page["name"].startswith((...))` should have all the `name` for each page to be included in this user's home page to potentially select (including previously uploaded pages if you still want these to be available)
       
-3) It is recommended that locally deploy these files first to test them at this point to ensure that A) they work as expected and B) do not contain errors with may crash the web hosted version of the app
-4) Log into cPanel
-5) Within the app's root directory, add:
+2) It is recommended that locally deploy these files first to test them at this point to ensure that A) they work as expected and B) do not contain errors with may crash the web hosted version of the app
+3) Log into cPanel
+4) Within the app's root directory, add:
    * The CSV data files and (only if a new user profile is being added) the updated version of `app.py` into the app's home directory
    * `ExampleUser_MethodPage.py`, `ExampleUser_ResultsPage.py`, and `ExampleUser_UserHomePage.py` into the `pages` subdirectory
-6) Navigate to cPanel's "Setup Python App" option in the "Software" tab
-7) Reset the currently running instance of the app to incorporate the files and changes you have just added
-8) Check the app to ensure that the newly added reports and accounts are accessible and work as expected
-9) For any problems, see the passenger.log (error log) in the logs folder in the cPanel File Manager to help narrow down the problem
-10) See the Troubleshooting Guidance at the bottom of this page to possible fixes to common problems
+5) Navigate to cPanel's "Setup Python App" option in the "Software" tab
+6) Reset the currently running instance of the app to incorporate the files and changes you have just added
+7) Check the app to ensure that the newly added reports and accounts are accessible and work as expected
+8) For any problems, see the passenger.log (error log) in the logs folder in the cPanel File Manager to help narrow down the problem
+9) See the Troubleshooting Guidance at the bottom of this page to possible fixes to common problems
 
 # Troubleshooting Guidance
-#### Cannot deploy first instance of Python Dash app
+### Cannot deploy first instance of Python Dash app
 Occassionally, files running in the background from previous instances of the app can cause conflicts (even if they are seemingly removed). I have personally found that contacting your hosting provider and requesting to reset your cPanel account to the last backed-up point where it was working can fix this. **Ensure that you save your data onto your PC before the reset**.
 
-#### Pages are not being displayed (and there is no error message)
+### Pages are not being displayed (and there is no error message)
 This is usually due to paths not being correctly declared or linked together
 * Check `href` links
 * Temporarily paste the following code to print out the page details in passenger.log to check if the pages have the expected details registered
+
+```
+total_no_pages = 0
+for page in dash.page_registry.values():
+    print(page["module"])
+    print(page["name"])
+    print(page["path"])
+    print(page["relative_path"])
+    total_no_pages += 1
+    print("---------")
+print("total_no_pages in app.py:", total_no_pages)
+```
 
 If a page is set up completely correctly and is *still* not being displayed, this may be due to a strange glitch where - sometimes - if file names for the equivalent of `ExampleUser_MethodPage.py` and `ExampleUser_ResultsPage.py` are higher or lower relative to the account's equivalent of `ExampleUser_UserHomePage.py` (when sorted by file name alphabetical order), then it will not be read. Changing the first few letters of `ExampleUser_MethodPage.py` and/or `ExampleUser_ResultsPage.py` to change the alphabetical position of these files relative to `ExampleUser_UserHomePage.py` (for the account it is not displaying it) can fix this. 
 
