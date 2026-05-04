@@ -7,7 +7,7 @@ from ReportDescriptiveText import StandardRHIMMSMethodText, StandardStatProcessi
 import pandas as pd
 
 #TODO: Update for each individual user account
-accountIndexPage = "/AddYourOwnHef"
+accountIndexPage = "/AddYourOwnAccountHef"
 #TODO: Update for each individual page
 page_name = "Experimental Methods Example"
 

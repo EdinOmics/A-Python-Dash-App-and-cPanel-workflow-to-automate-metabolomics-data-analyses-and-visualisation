@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 
 dash.register_page(__name__,
                    name = "Home Page: Example User",
-                   path="/AddYourOwnHef"
+                   path="/AddYourOwnAccountHef"
                    )
 
 layout = html.Div(
@@ -25,7 +25,7 @@ layout = html.Div(
                         for page in dash.page_registry.values()
                         if page["name"].startswith((
                                 "Experimental Methods Example", 
-                                "P202511 Exemple de rapport"
+                                "Experimental Results Example"
                                 ))
                         ], 
                     vertical = True, 

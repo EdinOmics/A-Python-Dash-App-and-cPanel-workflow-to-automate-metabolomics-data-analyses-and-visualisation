@@ -1,3 +1,4 @@
 {
     "ExampleUsername":"ExamplePassword",
+    "AlternativeExampleUsername":"AlternativeExamplePassword"
 }

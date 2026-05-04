@@ -156,9 +156,9 @@ def login_button_click(n_clicks, username, password):
         if VALID_USERNAME_PASSWORD.get(username) == password:
             login_user(User(username))
             if current_user.get_id() == "ExampleUsername":
-                children = ["Login Successful ", dcc.Link("View Reports", href="/AddYourOwnHef")] 
+                children = ["Login Successful ", dcc.Link("View Reports", href="/AddYourOwnAccountHef")] 
             elif current_user.get_id() == "AlternativeExampleUsername": #Just put in as an example of how to add more user accounts
-                children = ["Login Successful ", dcc.Link("View Reports", href="/AddYourOwnAlternativeHef")]
+                children = ["Login Successful ", dcc.Link("View Reports", href="/AddYourOwnAlternativeAccountHef")]
             else:
                 children = "Incorrect Username or Password. Is issue persists, contact EdinOmics for assistance."
 

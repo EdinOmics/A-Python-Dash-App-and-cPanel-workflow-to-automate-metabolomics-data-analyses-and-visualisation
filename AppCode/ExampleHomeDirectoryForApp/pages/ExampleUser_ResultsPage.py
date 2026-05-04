@@ -10,7 +10,7 @@ import ReportFunctions
 
 
 #TODO: Update for each individual user account
-accountIndexPage = "/AddYourOwnHef"
+accountIndexPage = "/AddYourOwnAccountHef"
 #TODO: Update for each individual page
 page_name = "Experimental Results Example"
 
