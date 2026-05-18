@@ -222,7 +222,7 @@ PCA_tab = dbc.Card(
             dbc.Row([
                 dbc.Col([
                     html.H5("VIP score (top 50)", style={'textAlign': 'center'}),
-                    html.P("View the top 50 ranked metabolites that drive variation along the first Principal Component axis (PC1) based on their Variable Importance Point (VIP) score. The red dashed line denotes the conventional significance threshold, where VIP scores above 1.0 are considered significant."),
+                    html.P("View the top 50 ranked metabolites that drive variation along the first Principal Component axis (PC1) based on their Variable Importance Point (VIP) score. The dashed line denotes the conventional significance threshold, where VIP scores above 1.0 are considered significant."),
                     dbc.Spinner(
                         children=[
                             dcc.Graph(id = "pca_vip_plot_ExampleReportSuffix")
@@ -426,7 +426,7 @@ PLSDA_tab = dbc.Card(
             dbc.Row([
                 dbc.Col([
                     html.H5("VIP score (top 50)", style={'textAlign': 'center'}),
-                    html.P("View the top 50 ranked metabolites that drive variation along the Component axis 1 based on their Variable Importance of Projection (VIP) score. The red dashed line denotes the conventional significance threshold, where VIP scores above 1.0 are considered significant."),
+                    html.P("View the top 50 ranked metabolites that drive variation along the Component axis 1 based on their Variable Importance of Projection (VIP) score. The dashed line denotes the conventional significance threshold, where VIP scores above 1.0 are considered significant."),
                     dbc.Spinner(
                         children=[
                             dcc.Graph(id = "plsda_vip_plot_ExampleReportSuffix")

@@ -259,16 +259,20 @@ def update_pca_UserGroupOrder(data, value_label):
         components_2D = components_2D.rename({0: 'PCA_Axis_1', 1: 'PCA_Axis_2'}, axis=1)
         components_2D = components_2D[["PCA_Axis_1", "PCA_Axis_2", "Sample", "Label"]]
 
+        CMYK_colours = ["#2C5FBE","#1A830C","#98AD20","#418A6E","#00C3FF","#FF00FF",
+                       "#CA50A2","#9A33B9","#7E2954","#FA8E00","#2427B8",
+                       "#E895B0","#8A6F6F"]
+
         #Plot the 2D PCA plot (non-selectable)
         pca_scores_plot = px.scatter(components_2D, x='PCA_Axis_1', 
                                      y='PCA_Axis_2',
                                      color=components_2D['Label'],
                                      hover_data = "Sample",
-                                     color_discrete_sequence=px.colors.qualitative.Light24
+                                     color_discrete_sequence = CMYK_colours
                                      )
         
         #Get list of colours + assign to each group
-        total_colours = px.colors.qualitative.Light24 + px.colors.qualitative.Light24 + px.colors.qualitative.Light24
+        total_colours = CMYK_colours*20
         total_colours = total_colours[0:len(components_2D["Label"].unique())]
         total_colours = {'Label':components_2D["Label"].unique(), 
                 'colour':total_colours}
@@ -391,7 +395,7 @@ def update_pca_UserGroupOrder(data, value_label):
     
         pca_loadings_plot = px.scatter(loadings, x="Loadings 1", y="Loadings 2", 
                          color="Metabolite",
-                         color_discrete_sequence=px.colors.qualitative.Light24, 
+                         color_discrete_sequence=CMYK_colours, 
                          custom_data = ["Metabolite"]
                         )
         #Remove legend (metabolites can be viewed by hovering over the datapoints)
@@ -408,7 +412,7 @@ def update_pca_UserGroupOrder(data, value_label):
         vip_plot_pca.layout.height = 900
         vip_plot_pca.update_yaxes(tickmode = 'linear') #Displays all categories
         #Add significance threshold line onto VIP plot
-        vip_plot_pca.add_vline(x=1.0, line_width=3, line_dash="dash", line_color="red")
+        vip_plot_pca.add_vline(x=1.0, line_width=3, line_dash="dash", line_color="#F16C06")
         
         #Change the order of the columns (i.e. sample groups) to the user selection
         mean_scaled_df = mean_scaled_df[value_label]
@@ -528,6 +532,10 @@ def pca_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_ty
         data_raw = pd.DataFrame(data_raw)
         data_norm = pd.DataFrame(data_norm)
 
+        CMYK_colours = ["#2C5FBE","#1A830C","#98AD20","#418A6E","#00C3FF","#FF00FF",
+                "#CA50A2","#9A33B9","#7E2954","#FA8E00","#2427B8",
+                "#E895B0","#8A6F6F"]
+
         #Define the variables (columns) which contain characters/strings
         #These sometimes need to be removed for downstream calculations
         #Create list of columns names with str_variables + metabolite of interest
@@ -578,17 +586,27 @@ def pca_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_ty
         
         #If user selects Bar Plot for Raw data
         if rawplot_type == "Bar Plot":
+
+            pca_any_metab_raw_fig = go.Figure()
+            # Example: assign colors for each metabolite
+            color_map = {
+                metabolite: color for metabolite, color in zip(
+                    metabolite_name,
+                    CMYK_colours * (len(metabolite_name)//len(CMYK_colours)+1)
+                )
+            }
+            for metabolite in list(metabolite_name):
+                pca_any_metab_raw_fig.add_trace(go.Bar(
+                    name=metabolite,
+                                        x=df_graph['Label'].unique(),
+                                        y=df_graph['Mean'][df_graph['Metabolites'] == metabolite],
+                                        error_y=dict(type='data',
+                                 array=df_graph['STDEV'][df_graph['Metabolites'] == metabolite]),
+                    marker_color=color_map[metabolite]
+                ))
             
             #If user selects Linear Y-axis
             if rawplot_axis == "Linear":
-                pca_any_metab_raw_fig = go.Figure()
-                for metabolite in list(metabolite_name):
-                    pca_any_metab_raw_fig.add_trace(go.Bar(name=metabolite,
-                                         x=df_graph['Label'].unique(),
-                                         y=df_graph['Mean'][df_graph['Metabolites'] == metabolite],
-                                         error_y=dict(type='data',
-                                                      array=df_graph['STDEV'][df_graph['Metabolites'] == metabolite])))
-                
                 pca_any_metab_raw_fig.update_layout(barmode='group', 
                                                     yaxis_title="Raw Intensities")
                 pca_any_metab_raw_fig.update_xaxes(categoryorder='array', 
@@ -596,14 +614,6 @@ def pca_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_ty
                 
             #If user selects Log10 Y-axis
             else:
-                pca_any_metab_raw_fig = go.Figure()
-                for metabolite in list(metabolite_name):
-                    pca_any_metab_raw_fig.add_trace(go.Bar(name=metabolite,
-                                         x=df_graph['Label'].unique(),
-                                         y=df_graph['Mean'][df_graph['Metabolites'] == metabolite],
-                                         error_y=dict(type='data',
-                                                      array=df_graph['STDEV'][df_graph['Metabolites'] == metabolite])))
-                
                 pca_any_metab_raw_fig.update_layout(barmode='group', 
                                                     yaxis_title="Raw Intensities (log10)")
                 pca_any_metab_raw_fig.update_yaxes(type="log")
@@ -623,13 +633,15 @@ def pca_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_ty
             
             #If user selects Linear Y-axis
             if rawplot_axis == 'Linear':
-                pca_any_metab_raw_fig = px.box(df_box, 
-                                x = 'Label', 
-                                y = 'Intensities', 
-                                color = 'Metabolites', 
-                                category_orders = {'Metabolites':list(metabolite_name), 
-                                                   'Label':value_label}, 
+                pca_any_metab_raw_fig = px.box(
+                                df_box,
+                                x='Label',
+                                y='Intensities',
+                                color='Metabolites',
+                                category_orders={'Metabolites': list(metabolite_name),
+                                                 'Label': value_label},
                                 labels={"Intensities": "Raw Intensities"},
+                                color_discrete_sequence=CMYK_colours,
                                 )
             else:
                 pca_any_metab_raw_fig = px.box(df_box, 
@@ -639,6 +651,7 @@ def pca_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_ty
                                 category_orders = {'Metabolites':list(metabolite_name), 
                                                    'Label':value_label},
                                 labels={"Intensities": "Raw Intensities (log10)"},
+                                color_discrete_sequence=CMYK_colours,
                                 log_y = True
                                 )    
                 
@@ -662,6 +675,7 @@ def pca_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_ty
                                 category_orders = {'Metabolites':list(metabolite_name), 
                                                     'Label':value_label}, 
                                 labels={"Intensities": "Raw Intensities"},
+                                color_discrete_sequence=CMYK_colours,
                                 )
             else:
                 pca_any_metab_raw_fig = px.violin(df_violin, 
@@ -671,6 +685,7 @@ def pca_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_ty
                                 category_orders = {'Metabolites':list(metabolite_name), 
                                                    'Label':value_label},
                                 labels={"Intensities": "Raw Intensities (log10)"},
+                                color_discrete_sequence=CMYK_colours,
                                 log_y = True
                                 ) 
             
@@ -680,12 +695,19 @@ def pca_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_ty
         if normplot_type == "Bar Plot":
             
             pca_any_metab_norm_fig = go.Figure()
+            color_map = {
+                metabolite: color for metabolite, color in zip(
+                    metabolite_name,
+                    CMYK_colours * (len(metabolite_name)//len(CMYK_colours)+1)
+                )
+            }
             for metabolite in list(metabolite_name):
                 pca_any_metab_norm_fig.add_trace(go.Bar(name=metabolite,
                                      x=df_graph_norm['Label'].unique(),
                                      y=df_graph_norm['Mean'][df_graph_norm['Metabolites'] == metabolite],
                                      error_y=dict(type='data',
-                                                  array=df_graph_norm['STDEV'][df_graph_norm['Metabolites'] == metabolite])))
+                                                  array=df_graph_norm['STDEV'][df_graph_norm['Metabolites'] == metabolite]), 
+                                                  marker_color=color_map[metabolite]))
             
             pca_any_metab_norm_fig.update_layout(barmode='group', 
                                                  yaxis_title="Normalised Intensities")
@@ -709,6 +731,7 @@ def pca_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_ty
                             category_orders = {'Metabolites':list(metabolite_name),
                                                'Label':value_label}, 
                             labels={"Intensities": "Normalised Intensities"},
+                            color_discrete_sequence=CMYK_colours,
                             )
         
         elif normplot_type == "Violin Plot":
@@ -727,6 +750,7 @@ def pca_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_ty
                             category_orders = {'Metabolites':list(metabolite_name),
                                                'Label':value_label}, 
                             labels={"Intensities": "Normalised Intensities"},
+                            color_discrete_sequence=CMYK_colours,
                             )
             
         del [metabolite_name, data_raw, data_norm, columns_keep, df_average_pre, 
@@ -834,6 +858,10 @@ def update_plsda_UserGroupOrder(data, value_label):
                                    dff], 
                                   axis = 1)
         scores = scores[["Component 1", "Component 2", "Sample", "Label"]]
+
+        CMYK_colours = ["#2C5FBE","#1A830C","#98AD20","#418A6E","#00C3FF","#FF00FF",
+                       "#CA50A2","#9A33B9","#7E2954","#FA8E00","#2427B8",
+                       "#E895B0","#8A6F6F"]
         
         #Plot PLS-DA scores
         interactive_plsda_plot_2D = px.scatter(
@@ -842,16 +870,15 @@ def update_plsda_UserGroupOrder(data, value_label):
             y="Component 2", 
             color=scores['Label'],
             hover_data = ['Sample'],
-            color_discrete_sequence=px.colors.qualitative.Light24
+            color_discrete_sequence=CMYK_colours
             )
         
-        total_colours = px.colors.qualitative.Light24 + px.colors.qualitative.Light24 + px.colors.qualitative.Light24
+        total_colours = CMYK_colours*20
         
         total_colours = total_colours[0:len(scores["Label"].unique())]
 
         total_colours = {'Label':scores["Label"].unique(), 
                 'colour':total_colours}
-        
         
         total_colours = pd.DataFrame(total_colours)
         
@@ -974,7 +1001,7 @@ def update_plsda_UserGroupOrder(data, value_label):
         plsda_loadings_plot = px.scatter(
             loadings, x="Loadings 1", y="Loadings 2",   
             color='Metabolite',
-            color_discrete_sequence=px.colors.qualitative.Light24, 
+            color_discrete_sequence=CMYK_colours, 
             custom_data = ["Metabolite"]
         )
         plsda_loadings_plot.update_layout(showlegend=False)
@@ -990,7 +1017,7 @@ def update_plsda_UserGroupOrder(data, value_label):
         vip_plot_plsda.layout.height = 900
         vip_plot_plsda.update_yaxes(tickmode = 'linear') #Displays all categories
         #Add significance threshold line onto VIP plot
-        vip_plot_plsda.add_vline(x=1.0, line_width=3, line_dash="dash", line_color="red")
+        vip_plot_plsda.add_vline(x=1.0, line_width=3, line_dash="dash", line_color="#F16C06")
         
         #Change the order of the columns (i.e. sample groups) to the user selection
         mean_scaled_df = mean_scaled_df[value_label]
@@ -1112,6 +1139,10 @@ def plsda_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_
         data_raw = pd.DataFrame(data_raw)
         data_norm = pd.DataFrame(data_norm)
 
+        CMYK_colours = ["#2C5FBE","#1A830C","#98AD20","#418A6E","#00C3FF","#FF00FF",
+                "#CA50A2","#9A33B9","#7E2954","#FA8E00","#2427B8",
+                "#E895B0","#8A6F6F"]
+
         #Define the variables (columns) which contain characters/strings
         #These sometimes need to be removed for downstream calculations
         #Create list of columns names with str_variables + metabolite of interest
@@ -1159,17 +1190,23 @@ def plsda_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_
         
         #If user selects Bar Plot for Raw data
         if rawplot_type == "Bar Plot":
-            
+
+            plsda_any_metab_raw_fig = go.Figure()
+            color_map = {
+                metabolite: color for metabolite, color in zip(
+                    metabolite_name,
+                    CMYK_colours * (len(metabolite_name)//len(CMYK_colours)+1)
+                )
+            }
+            for metabolite in list(metabolite_name):
+                plsda_any_metab_raw_fig.add_trace(go.Bar(name=metabolite,
+                                        x=df_graph['Label'].unique(),
+                                        y=df_graph['Mean'][df_graph['Metabolites'] == metabolite],
+                                        error_y=dict(type='data',
+                                                    array=df_graph['STDEV'][df_graph['Metabolites'] == metabolite]), 
+                                        marker_color=color_map[metabolite]))
             #If user selects Linear Y-axis
             if rawplot_axis == "Linear":
-                plsda_any_metab_raw_fig = go.Figure()
-                for metabolite in list(metabolite_name):
-                    plsda_any_metab_raw_fig.add_trace(go.Bar(name=metabolite,
-                                         x=df_graph['Label'].unique(),
-                                         y=df_graph['Mean'][df_graph['Metabolites'] == metabolite],
-                                         error_y=dict(type='data',
-                                                      array=df_graph['STDEV'][df_graph['Metabolites'] == metabolite])))
-                
                 plsda_any_metab_raw_fig.update_layout(barmode='group', 
                                                       yaxis_title="Raw Intensities")
                 plsda_any_metab_raw_fig.update_xaxes(categoryorder='array', 
@@ -1177,14 +1214,6 @@ def plsda_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_
                 
             #If user selects Log10 Y-axis
             else:
-                plsda_any_metab_raw_fig = go.Figure()
-                for metabolite in list(metabolite_name):
-                    plsda_any_metab_raw_fig.add_trace(go.Bar(name=metabolite,
-                                         x=df_graph['Label'].unique(),
-                                         y=df_graph['Mean'][df_graph['Metabolites'] == metabolite],
-                                         error_y=dict(type='data',
-                                                      array=df_graph['STDEV'][df_graph['Metabolites'] == metabolite])))
-                
                 plsda_any_metab_raw_fig.update_layout(barmode='group', 
                                                       yaxis_title="Raw Intensities (log10)")
                 plsda_any_metab_raw_fig.update_yaxes(type="log")
@@ -1210,6 +1239,7 @@ def plsda_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_
                                 color = 'Metabolites', 
                                 category_orders = {'Metabolites':list(metabolite_name), 
                                                    'Label':value_label}, 
+                                color_discrete_sequence=CMYK_colours,
                                 labels={"Intensities": "Raw Intensities"},
                                 )
             else:
@@ -1220,6 +1250,7 @@ def plsda_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_
                                 category_orders = {'Metabolites':list(metabolite_name), 
                                                    'Label':value_label},
                                 labels={"Intensities": "Raw Intensities (log10)"},
+                                color_discrete_sequence=CMYK_colours,
                                 log_y = True
                                 )    
         #If user selects violin plot for Raw data
@@ -1241,6 +1272,7 @@ def plsda_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_
                                 category_orders = {'Metabolites':list(metabolite_name), 
                                                     'Label':value_label}, 
                                 labels={"Intensities": "Raw Intensities"},
+                                color_discrete_sequence=CMYK_colours,
                                 )
             else:
                 plsda_any_metab_raw_fig = px.violin(df_violin, 
@@ -1250,6 +1282,7 @@ def plsda_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_
                                 category_orders = {'Metabolites':list(metabolite_name), 
                                                    'Label':value_label},
                                 labels={"Intensities": "Raw Intensities (log10)"},
+                                color_discrete_sequence=CMYK_colours,
                                 log_y = True
                                 ) 
         
@@ -1260,12 +1293,19 @@ def plsda_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_
             df_graph_norm = pd.concat([df_average_norm, df_stdev_norm["STDEV"]], axis = 1)
             
             plsda_any_metab_norm_fig = go.Figure()
+            color_map = {
+                metabolite: color for metabolite, color in zip(
+                    metabolite_name,
+                    CMYK_colours * (len(metabolite_name)//len(CMYK_colours)+1)
+                )
+            }
             for metabolite in list(metabolite_name):
                 plsda_any_metab_norm_fig.add_trace(go.Bar(name=metabolite,
-                                     x=df_graph_norm['Label'].unique(),
-                                     y=df_graph_norm['Mean'][df_graph_norm['Metabolites'] == metabolite],
-                                     error_y=dict(type='data',
-                                                  array=df_graph_norm['STDEV'][df_graph_norm['Metabolites'] == metabolite])))
+                                    x=df_graph_norm['Label'].unique(),
+                                    y=df_graph_norm['Mean'][df_graph_norm['Metabolites'] == metabolite],
+                                    error_y=dict(type='data',
+                                                 array=df_graph_norm['STDEV'][df_graph_norm['Metabolites'] == metabolite]), 
+                                    marker_color=color_map[metabolite]))
             
             plsda_any_metab_norm_fig.update_layout(barmode='group', 
                                                    yaxis_title="Normalised Intensities")
@@ -1288,7 +1328,8 @@ def plsda_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_
                             color = 'Metabolites', 
                             category_orders = {'Metabolites':list(metabolite_name),
                                                'Label':value_label}, 
-                            labels={"Intensities": "Normalised Intensities"}
+                            labels={"Intensities": "Normalised Intensities"}, 
+                            color_discrete_sequence=CMYK_colours,
                             )
             
         elif normplot_type == "Violin Plot":
@@ -1306,7 +1347,8 @@ def plsda_any_metab_plots_UserGroupOrder(n_clicks, data_raw, data_norm, rawplot_
                             color = 'Metabolites', 
                             category_orders = {'Metabolites':list(metabolite_name),
                                                'Label':value_label}, 
-                            labels={"Intensities": "Normalised Intensities"}
+                            labels={"Intensities": "Normalised Intensities"}, 
+                            color_discrete_sequence=CMYK_colours,
                             )
             
         del [n_clicks, metabolite_name, data_raw, data_norm, 
@@ -1443,12 +1485,12 @@ def volcanic_eruption_FCThreshold(n_clicks, data, state_1, state_2, sig_thres, f
                 df_fc_p_val_sub = df_fc_p_val_sub[(df_fc_p_val_sub['Fold-Change(log2)'] > fc_thres) | (df_fc_p_val_sub['Fold-Change(log2)'] < fc_thres*-1)]  
                 #Make specific metabolites correspond to red
                 for idx in list(df_fc_p_val_sub.index):
-                    df_fc_p_val.at[idx, 'colour'] = 'red'
+                    df_fc_p_val.at[idx, 'colour'] = "orange"
                 volcano_plot = px.scatter(df_fc_p_val, 
                                           x="Fold-Change(log2)",
                                           y="p-value(-log10)", 
                                           color = 'colour', 
-                                          color_discrete_map={'red': 'red', 'blue': 'blue'},
+                                          color_discrete_map={"orange": "orange", 'blue': 'blue'},
                                           hover_data = ["Metabolite", "Group", "p-value"], 
                                           custom_data=["Metabolite"], 
                                           height=800)
@@ -1476,12 +1518,12 @@ def volcanic_eruption_FCThreshold(n_clicks, data, state_1, state_2, sig_thres, f
                 df_fc_p_val_sub = df_fc_p_val[df_fc_p_val['p-value(-log10)'] >= sig_thres]
                 #Make specific metabolites correspond to red
                 for idx in list(df_fc_p_val_sub.index):
-                    df_fc_p_val.at[idx, 'colour'] = 'red'
+                    df_fc_p_val.at[idx, 'colour'] = "orange"
                 volcano_plot = px.scatter(df_fc_p_val, 
                                           x="Fold-Change(log2)",
                                           y="p-value(-log10)", 
                                           color = 'colour', 
-                                          color_discrete_map={'red': 'red', 'blue': 'blue'},
+                                          color_discrete_map={"orange": "orange", 'blue': 'blue'},
                                           hover_data = ["Metabolite", "Group", "p-value"], 
                                           custom_data=["Metabolite"], 
                                           height=800)
@@ -1500,12 +1542,12 @@ def volcanic_eruption_FCThreshold(n_clicks, data, state_1, state_2, sig_thres, f
                 df_fc_p_val_sub = df_fc_p_val[(df_fc_p_val['Fold-Change(log2)'] > fc_thres) | (df_fc_p_val['Fold-Change(log2)'] < fc_thres*-1)]  
                 #Make specific metabolites correspond to red
                 for idx in list(df_fc_p_val_sub.index):
-                    df_fc_p_val.at[idx, 'colour'] = 'red'
+                    df_fc_p_val.at[idx, 'colour'] = "orange"
                 volcano_plot = px.scatter(df_fc_p_val, 
                                           x="Fold-Change(log2)",
                                           y="p-value(-log10)", 
                                           color = 'colour', 
-                                          color_discrete_map={'red': 'red', 'blue': 'blue'},
+                                          color_discrete_map={"orange": "orange", 'blue': 'blue'},
                                           hover_data = ["Metabolite", "Group", "p-value"], 
                                           custom_data=["Metabolite"], 
                                           height=800)
