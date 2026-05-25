@@ -157,7 +157,7 @@ def login_button_click(n_clicks, username, password):
             login_user(User(username))
             if current_user.get_id() == "ExampleUsername":
                 children = ["Login Successful ", dcc.Link("View Reports", href="/AddYourOwnAccountHef")] 
-            elif current_user.get_id() == "AlternativeExampleUsername": #Just put in as an example of how to add more user accounts
+            elif current_user.get_id() == "AlternativeExampleUsername": #Add more user accounts with elif argument
                 children = ["Login Successful ", dcc.Link("View Reports", href="/AddYourOwnAlternativeAccountHef")]
             else:
                 children = "Incorrect Username or Password. Is issue persists, contact EdinOmics for assistance."
@@ -165,7 +165,6 @@ def login_button_click(n_clicks, username, password):
             return children
         children = "Incorrect Username or Password. Is issue persists, contact EdinOmics for assistance"
         return children
-    
     
 if __name__ == "__main__":
     app.run(debug=True)
