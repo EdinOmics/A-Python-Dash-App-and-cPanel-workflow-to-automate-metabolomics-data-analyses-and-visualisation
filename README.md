@@ -159,10 +159,11 @@ ExampleHomeDirectoryForApp:
      * Update the existing `app.py`
        * In the `login_button_click()` function at the bottom of the script, copy an `elif` statement and change the `current_user.get_id()` and `href`
      * `ExampleUser_UserHomePage.py`
-       * `name` should have the User's name
+       * `name` should have the User's name or whatever you would like displayed in the web tab text
        * `path` should match `accountIndexPage` in the `ExampleUser_MethodPage.py` and `ExampleUser_ResultsPage.py` scripts **and** the `href` for that user account in the `login_button_click()` function of `app.py`
-       * The first `html.H2` within the layout's `html.Div([])` should also have the name of the User specified
-       * The list contained in `if page["name"].startswith((...))` should have all the `name` for each page to be included in this user's home page to potentially select (including previously uploaded pages if you still want these to be available)
+       * `page_title_UserView` should also have the name of the User specified
+       * `User_ListOfProjects` should contain the `name` for each page to be included in this user's home page to potentially select (including previously uploaded pages if you still want these to be available)
+       * Update the `id` names in this script so that they are not duplicates of the equivalent script for a different user account. Personally, I would recommend making the sufficies of the `id` incorporate the user's name to try and keep these unique. 
       
 2) It is recommended that locally deploy these files first to test them at this point to ensure that A) they work as expected and B) do not contain errors with may crash the web hosted version of the app
 3) Log into cPanel
