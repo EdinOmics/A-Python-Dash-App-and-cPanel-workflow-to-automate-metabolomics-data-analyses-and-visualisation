@@ -14,6 +14,7 @@ from flask import Flask
 from flask_login import login_user, LoginManager, UserMixin, current_user
 import dash_bootstrap_components as dbc
 import json
+import hashlib
 
 import dash
 from dash import dcc, html, Input, Output, State
@@ -36,6 +37,11 @@ app = dash.Dash(
 
 #Load Username and Password details
 # reading the data from the file 
+# Important: store passwords as Hash to make apps more secure (and to comply with GDPR laws/avoid nasty fines!)
+# For this example app only (!): 
+# ExampleUsername = ExamplePassword
+# AlternativeExampleUsername = AlternativeExamplePassword
+# For a proper app, never record the plain text password in any part of the scripts or app directory
 with open('AccessDetails.txt') as f: 
     data = f.read() 
 # reconstructing the data as a dictionary 
@@ -149,6 +155,8 @@ def update_authentication_status(_):
     )
 def login_button_click(n_clicks, username, password):
     if n_clicks > 0:
+        #When the user inputs a password, convert it to hash version (to match with hash in AccessDetails.txt)
+        password = hashlib.sha256(password.encode()).hexdigest()
         if VALID_USERNAME_PASSWORD.get(username) is None:
             return "Invalid Username or Password"
         #If correct login details provided: direct the user to their own home page to access their project pages

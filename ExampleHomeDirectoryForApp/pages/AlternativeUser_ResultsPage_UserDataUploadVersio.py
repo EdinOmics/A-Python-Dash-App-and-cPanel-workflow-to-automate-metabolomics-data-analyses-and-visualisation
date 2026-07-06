@@ -13,8 +13,7 @@ import base64
 import io
 import datetime
 
-#Functions added 22/09/2025
-from ReportFunctions import update_raw_table, update_normalised_table, update_pca, update_average_plots_pca, update_plsda, update_average_plots_plsda, plsda_any_metab_plots, volcanic_eruption, CustomHeatmap, volcanic_eruption_download, update_average_plots_volcano, raw_transposed_data_download, processed_data_download, pca_download_scores, pca_download_loadings, pca_download_vip_scores, plsda_scores_download, plsda_loadings_download, plsda_vip_scores_download
+import ReportFunctions
 
 #TODO: Update for each individual user account
 accountIndexPage = "/AddYourOwnAlternativeAccountHef"
@@ -1147,7 +1146,7 @@ def update_data(n_clicks, df_sel, value_label, value_sample):
     )
 def update_raw_table_scriptInitiate(data):
     
-    overview_table, hist_raw = update_raw_table(data)
+    overview_table, hist_raw = ReportFunctions.update_raw_table(data)
     
     return overview_table, hist_raw
 
@@ -1161,7 +1160,7 @@ def update_raw_table_scriptInitiate(data):
     )
 def update_normalised_table_scriptInitiate(data):
     
-    overview_table, hist_norm = update_normalised_table(data)
+    overview_table, hist_norm = ReportFunctions.update_normalised_table(data)
     
     return overview_table, hist_norm
 
@@ -1177,7 +1176,7 @@ def update_normalised_table_scriptInitiate(data):
 )
 def update_pca_scriptInitialise(data):
     
-    pca_scores_plot, pca_loadings_plot, vip_plot_pca, heatmap_mean_pca = update_pca(data)
+    pca_scores_plot, pca_loadings_plot, vip_plot_pca, heatmap_mean_pca = ReportFunctions.update_pca_UserGroupOrder(data)
     
     return pca_scores_plot, pca_loadings_plot, vip_plot_pca, heatmap_mean_pca
 
@@ -1192,7 +1191,7 @@ def update_pca_scriptInitialise(data):
     )
 def update_average_plots_pca_scriptInitialise(clickData, df_raw_T, df_norm):
     
-    fig_raw_pca, fig_norm_pca = update_average_plots_pca(clickData, df_raw_T, df_norm)
+    fig_raw_pca, fig_norm_pca = ReportFunctions.update_average_plots_pca(clickData, df_raw_T, df_norm)
     
     return fig_raw_pca, fig_norm_pca
 
@@ -1499,7 +1498,7 @@ def pca_any_metab_plots(n_clicks, data_raw, data_norm, rawplot_type, rawplot_axi
 )
 def update_plsda_scriptInitialise(data):
     
-    interactive_plsda_plot_2D, plsda_loadings_plot, vip_plot_plsda, heatmap_mean_plsda = update_plsda(data)
+    interactive_plsda_plot_2D, plsda_loadings_plot, vip_plot_plsda, heatmap_mean_plsda = ReportFunctions.update_plsda(data)
     
     return interactive_plsda_plot_2D, plsda_loadings_plot, vip_plot_plsda, heatmap_mean_plsda
 
@@ -1514,7 +1513,7 @@ def update_plsda_scriptInitialise(data):
     )
 def update_average_plots_plsda_scriptInitialise(clickData, df_raw_T, df_norm):
     
-    fig_raw_plsda, fig_norm_plsda = update_average_plots_plsda(clickData, df_raw_T, df_norm)
+    fig_raw_plsda, fig_norm_plsda = ReportFunctions.update_average_plots_plsda(clickData, df_raw_T, df_norm)
     
     return fig_raw_plsda, fig_norm_plsda
 
@@ -1533,7 +1532,7 @@ def update_average_plots_plsda_scriptInitialise(clickData, df_raw_T, df_norm):
 )
 def plsda_any_metab_plots_scriptInitialise(n_clicks, data_raw, data_norm, rawplot_type, rawplot_axis, normplot_type, metabolite_name):
     
-    plsda_any_metab_raw_fig, plsda_any_metab_norm_fig = plsda_any_metab_plots(n_clicks, 
+    plsda_any_metab_raw_fig, plsda_any_metab_norm_fig = ReportFunctions.plsda_any_metab_plots(n_clicks, 
                                                                               data_raw, data_norm, rawplot_type, 
                                                                               rawplot_axis, normplot_type, 
                                                                               metabolite_name)
@@ -1592,7 +1591,7 @@ def group_options(data):
 )
 def volcanic_eruption_scriptInitialise(n_clicks, data, state_1, state_2, sig_thres):
     
-    volcano_plot = volcanic_eruption(n_clicks, data, state_1, state_2, sig_thres)
+    volcano_plot = ReportFunctions.volcanic_eruption(n_clicks, data, state_1, state_2, sig_thres)
     
     return volcano_plot
 
@@ -1656,7 +1655,7 @@ def heatmap_options(data, allMetabolites, clearMetabolites):
 )
 def CustomHeatmap_scriptInitialise(n_clicks, data, SelectedGroups, SelectedMetabolites):
     
-    custom_heatmap = CustomHeatmap(n_clicks, data, SelectedGroups, SelectedMetabolites)
+    custom_heatmap = ReportFunctions.CustomHeatmap(n_clicks, data, SelectedGroups, SelectedMetabolites)
     
     return custom_heatmap
 
@@ -1674,7 +1673,7 @@ def CustomHeatmap_scriptInitialise(n_clicks, data, SelectedGroups, SelectedMetab
 def volcanic_eruption_download_scriptInitialise(n_clicks, data_raw, state_1, state_2, sig_thres, data_norm):
     
     #Function creates the file to be 'sent' to the user to download in the return function below
-    volcanic_eruption_download(n_clicks, data_raw, state_1, state_2, sig_thres, data_norm, project_no)
+    ReportFunctions.volcanic_eruption_download(n_clicks, data_raw, state_1, state_2, sig_thres, data_norm, project_no)
     
     return dcc.send_file(f"EdinOmics_{project_no}_Volcano_plot_data.xlsx")
 
@@ -1689,7 +1688,7 @@ def volcanic_eruption_download_scriptInitialise(n_clicks, data_raw, state_1, sta
     )
 def update_average_plots_volcano_scriptInitialise(clickData, df_raw_T, df_norm):
     
-    fig_raw_volcano, fig_norm_volcano = update_average_plots_volcano(clickData, df_raw_T, df_norm)
+    fig_raw_volcano, fig_norm_volcano = ReportFunctions.update_average_plots_volcano(clickData, df_raw_T, df_norm)
     
     return fig_raw_volcano, fig_norm_volcano
 
@@ -1842,7 +1841,7 @@ def batch_correction_visualisation(n_clicks):
 )
 def raw_transposed_data_download_scriptInitialise(n_clicks, n_clicks_inTab, data):
     
-    raw_transposed_data_download(n_clicks, n_clicks_inTab, data, project_no)
+    ReportFunctions.raw_transposed_data_download(n_clicks, n_clicks_inTab, data, project_no)
     
     return dcc.send_file(f"EdinOmics_{project_no}_raw_data.xlsx")
 
@@ -1856,7 +1855,7 @@ def raw_transposed_data_download_scriptInitialise(n_clicks, n_clicks_inTab, data
 )
 def processed_data_download_scriptInitialise(n_clicks, n_clicks_inTab, data):
     
-    processed_data_download(n_clicks, n_clicks_inTab, data, project_no)
+    ReportFunctions.processed_data_download(n_clicks, n_clicks_inTab, data, project_no)
     
     return dcc.send_file(f"EdinOmics_{project_no}_normalised_data.xlsx")
     
@@ -1870,7 +1869,7 @@ def processed_data_download_scriptInitialise(n_clicks, n_clicks_inTab, data):
 )
 def pca_download_scores_scriptInitialise(n_clicks, n_clicks_inTab, data):
     
-    pca_download_scores(n_clicks, n_clicks_inTab, data, project_no)
+    ReportFunctions.pca_download_scores(n_clicks, n_clicks_inTab, data, project_no)
     # pca_download_scores(n_clicks, n_clicks_inTab, data)
     
     return dcc.send_file(f"EdinOmics_{project_no}_pca_scores_results.xlsx")
@@ -1885,7 +1884,7 @@ def pca_download_scores_scriptInitialise(n_clicks, n_clicks_inTab, data):
 )
 def pca_download_loadings_scriptInitialise(n_clicks, n_clicks_inTab, data):
     
-    pca_download_loadings(n_clicks, n_clicks_inTab, data, project_no)
+    ReportFunctions.pca_download_loadings(n_clicks, n_clicks_inTab, data, project_no)
     
     return dcc.send_file(f"EdinOmics_{project_no}_pca_loadings_results.xlsx")
     
@@ -1899,7 +1898,7 @@ def pca_download_loadings_scriptInitialise(n_clicks, n_clicks_inTab, data):
 )
 def pca_download_vip_scores_scriptInitialise(n_clicks, n_clicks_inTab, data):
     
-    pca_download_vip_scores(n_clicks, n_clicks_inTab, data, project_no)
+    ReportFunctions.pca_download_vip_scores(n_clicks, n_clicks_inTab, data, project_no)
     
     return dcc.send_file(f"EdinOmics_{project_no}_pca_vip_scores.xlsx")
 
@@ -1913,7 +1912,7 @@ def pca_download_vip_scores_scriptInitialise(n_clicks, n_clicks_inTab, data):
 )
 def plsda_scores_download_scriptInitialise(n_clicks, n_clicks_inTab, data):
     
-    plsda_scores_download(n_clicks, n_clicks_inTab, data, project_no)
+    ReportFunctions.plsda_scores_download(n_clicks, n_clicks_inTab, data, project_no)
     
     return dcc.send_file(f"EdinOmics_{project_no}_pls-da_scores_results.xlsx")
     
@@ -1927,7 +1926,7 @@ def plsda_scores_download_scriptInitialise(n_clicks, n_clicks_inTab, data):
 )
 def plsda_loadings_download_scriptInitialise(n_clicks, n_clicks_inTab, data):
     
-    plsda_loadings_download(n_clicks, n_clicks_inTab, data, project_no)
+    ReportFunctions.plsda_loadings_download(n_clicks, n_clicks_inTab, data, project_no)
     
     return dcc.send_file(f"EdinOmics_{project_no}_pls-da_loadings_results.xlsx")
     
@@ -1941,6 +1940,6 @@ def plsda_loadings_download_scriptInitialise(n_clicks, n_clicks_inTab, data):
 )
 def plsda_vip_scores_download_scriptInitialise(n_clicks, n_clicks_inTab, data):
     
-    plsda_vip_scores_download(n_clicks, n_clicks_inTab, data, project_no)
+    ReportFunctions.plsda_vip_scores_download(n_clicks, n_clicks_inTab, data, project_no)
     
     return dcc.send_file(f"EdinOmics_{project_no}_pls-da_vip_scores.xlsx")

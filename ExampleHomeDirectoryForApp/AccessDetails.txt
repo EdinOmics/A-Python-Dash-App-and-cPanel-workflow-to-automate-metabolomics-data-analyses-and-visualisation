@@ -1,4 +1,4 @@
 {
-    "ExampleUsername":"ExamplePassword",
-    "AlternativeExampleUsername":"AlternativeExamplePassword"
+    "ExampleUsername":"a1cdf9b86be063bced6916eb4bb31d600f23424270bd6dd9d780195d93449d52",
+    "AlternativeExampleUsername":"050a8bcba8a0c4731b706f77baf7acb6777a9c039d278810daed47068d9dd42b"
 }
